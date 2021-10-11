@@ -35,7 +35,6 @@ class WaypointUpdater(object):
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
-        rospy.logwarn("final_waypoints_pub done")
 
         self.pose = None
         self.base_waypoints = None
@@ -62,7 +61,7 @@ class WaypointUpdater(object):
         clostest_coord = self.waypoints_2d[clostest_idx]
         prev_coord = self.waypoints_2d[clostest_idx-1]
 
-        # Equation for hyperplave through clostest_coords
+        # Equation for hyperplane through clostest_coords
         cl_vect = np.array(clostest_coord)
         prev_vect = np.array(prev_coord)
         pos_vect = np.array([x,y])
