@@ -9,7 +9,7 @@ ONE_MPH = 0.44704
 
 
 class Controller(object):
-    def __init__(self, vehicle_mass, fuel_capacity, brake_deadband, decel_limit,
+    def __init__(self, vehicle_mass, fuel_capacity, brake_deadband, decel_limit, \
         accel_limit, wheel_radius, wheel_base, steer_ratio, max_lat_accel, max_steer_angle):
 
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lat_accel, max_steer_angle)
@@ -22,7 +22,7 @@ class Controller(object):
         self.throttle_controller = PID(kp,ki,kd,mn,mx)
 
         # filter high frequency noise
-        tau = 0.5 # 1/(2pi*tau) = cutof frequency
+        tau = 0.5 # 1/(2pi*tau) = cut of frequency
         ts = .02 # Sample time
         self.vel_lpf = LowPassFilter(tau,ts)
 
