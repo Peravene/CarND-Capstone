@@ -35,7 +35,7 @@ class Controller(object):
 
         self.last_time = rospy.get_time()
 
-    def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
+    def control(self, current_vel, dbw_enabled, target_vel, target_angel, current_angel):
         # Change the arg, kwarg list to suit your needs
         # Return throttle, brake, steer
 
@@ -44,14 +44,15 @@ class Controller(object):
             return 0., 0., 0.
 
         current_vel = self.vel_lpf.filt(current_vel)
-        steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
+        steering = self.yaw_controller.get_steering(target_vel, target_angel, current_vel)
 
-        # rospy.logwarn("Angular vel: {0}" .format(angular_vel))
+        # rospy.logwarn("Current Angular vel: {0}" .format(current_angel))
+        # rospy.logwarn("Target Angular vel: {0}" .format(target_angel))
         # rospy.logwarn("Current velocity: {0}" .format(current_vel))
         # rospy.logwarn("Filtered velocity: {0}" .format(self.vel_lpf.get()))
-        # rospy.logwarn("Target velocity: {0}" .format(linear_vel))
+        # rospy.logwarn("Target velocity: {0}" .format(target_vel))
 
-        vel_error = linear_vel - current_vel
+        vel_error = target_vel - current_vel
         self.last_vel = current_vel
 
         current_time = rospy.get_time()
@@ -61,7 +62,7 @@ class Controller(object):
         throttle = self. throttle_controller.step(vel_error, sample_time)
         brake = 0
 
-        if linear_vel == 0. and current_vel < 0.1:
+        if target_vel == 0. and current_vel < 0.1:
             throttle = 0
             brake = 700 #N*m - to hold the car in place if we are stopped at a light. Accelevaration ~ 1m/s^2
 
@@ -70,8 +71,8 @@ class Controller(object):
             decel = max(vel_error, self. decel_limit)
             brake = abs(decel)*self.vehicle_mass*self.wheel_radius # Torque N*m
 
-        rospy.logwarn("Steering: {0}" .format(steering))
-        rospy.logwarn("Throttle: {0}" .format(throttle))
-        rospy.logwarn("Brake: {0}" .format(brake))
+        #rospy.logwarn("Steering: {0}" .format(steering))
+        #rospy.logwarn("Throttle: {0}" .format(throttle))
+        #rospy.logwarn("Brake: {0}" .format(brake))
 
         return throttle, brake, steering

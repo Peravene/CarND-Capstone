@@ -143,8 +143,6 @@ class TLDetector(object):
         closest_light = None
         line_wp_idx = None
 
-        light = None
-
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
         if(self.pose):
@@ -159,9 +157,9 @@ class TLDetector(object):
                 # Find closet stop line waypoint index
                 d = temp_wp_idx - car_wp_idx
                 if d >= 0 and d < diff:
-                        diff = d
-                        closest_light = light
-                        line_wp_idx = temp_wp_idx
+                    diff = d
+                    closest_light = light
+                    line_wp_idx = temp_wp_idx
 
         if closest_light:
             state = self.get_light_state(closest_light)
