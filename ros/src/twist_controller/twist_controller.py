@@ -74,6 +74,8 @@ class Controller(object):
             brake = abs(decel)*self.vehicle_mass*self.wheel_radius # Torque N*m
 
         # Steering ------------------------------------------------
+        # positive - left
+        # negative - right
         steering = self.yaw_controller.get_steering(target_vel, target_angel, current_vel)
 
         #rospy.logwarn("Steering: {0}" .format(steering))
