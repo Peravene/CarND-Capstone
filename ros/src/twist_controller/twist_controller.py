@@ -14,6 +14,11 @@ class Controller(object):
 
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lat_accel, max_steer_angle)
 
+        self.vehicle_mass = vehicle_mass
+        self.decel_limit = decel_limit
+        self.accel_limit = accel_limit
+        self.wheel_radius = wheel_radius
+
         kp = 0.3 
         ki = 0.1
         kd = 0.
@@ -26,12 +31,7 @@ class Controller(object):
         ts = .02 # Sample time
         self.vel_lpf = LowPassFilter(tau,ts)
 
-        self.vehicle_mass = vehicle_mass
-        self.fuel_capacity = fuel_capacity
-        self.brake_deadband = brake_deadband
-        self.decel_limit = decel_limit
-        self.accel_limit = accel_limit
-        self.wheel_radius = wheel_radius
+
 
         self.last_time = rospy.get_time()
 
@@ -43,8 +43,8 @@ class Controller(object):
             self.throttle_controller.reset()
             return 0., 0., 0.
 
+        # Filter
         current_vel = self.vel_lpf.filt(current_vel)
-        steering = self.yaw_controller.get_steering(target_vel, target_angel, current_vel)
 
         # rospy.logwarn("Current Angular vel: {0}" .format(current_angel))
         # rospy.logwarn("Target Angular vel: {0}" .format(target_angel))
@@ -52,24 +52,29 @@ class Controller(object):
         # rospy.logwarn("Filtered velocity: {0}" .format(self.vel_lpf.get()))
         # rospy.logwarn("Target velocity: {0}" .format(target_vel))
 
-        vel_error = target_vel - current_vel
-        self.last_vel = current_vel
-
+        # TIME
         current_time = rospy.get_time()
         sample_time = current_time - self.last_time
         self.last_time = current_time
 
-        throttle = self. throttle_controller.step(vel_error, sample_time)
-        brake = 0
+        # Brake and Throttle -------------------------------------
+        # accelerate 
+        vel_error = target_vel - current_vel
+        throttle = self.throttle_controller.step(vel_error, sample_time)
+        brake = 0.
 
         if target_vel == 0. and current_vel < 0.1:
-            throttle = 0
+            # Standstill
+            throttle = 0.
             brake = 700 #N*m - to hold the car in place if we are stopped at a light. Accelevaration ~ 1m/s^2
-
         elif throttle <0.1 and vel_error < 0:
-            throttle = 0
-            decel = max(vel_error, self. decel_limit)
+            # Braking
+            throttle = 0.
+            decel = max(vel_error, self.decel_limit)
             brake = abs(decel)*self.vehicle_mass*self.wheel_radius # Torque N*m
+
+        # Steering ------------------------------------------------
+        steering = self.yaw_controller.get_steering(target_vel, target_angel, current_vel)
 
         #rospy.logwarn("Steering: {0}" .format(steering))
         #rospy.logwarn("Throttle: {0}" .format(throttle))
