@@ -28,14 +28,14 @@ class Controller(object):
 
         # filter high frequency noise
         tau = 0.5 # 1/(2pi*tau) = cut of frequency
-        ts = .02 # Sample time
+        ts = 0.02 # Sample time
         self.vel_lpf = LowPassFilter(tau,ts)
 
 
 
         self.last_time = rospy.get_time()
 
-    def control(self, current_vel, dbw_enabled, target_vel, target_angel, current_angel):
+    def control(self, current_vel, dbw_enabled, target_vel, target_angel):
         # Change the arg, kwarg list to suit your needs
         # Return throttle, brake, steer
 
@@ -67,7 +67,7 @@ class Controller(object):
             # Standstill
             throttle = 0.
             brake = 700 #N*m - to hold the car in place if we are stopped at a light. Accelevaration ~ 1m/s^2
-        elif throttle <0.1 and vel_error < 0:
+        elif throttle <0.1 and vel_error < 0.:
             # Braking
             throttle = 0.
             decel = max(vel_error, self.decel_limit)
