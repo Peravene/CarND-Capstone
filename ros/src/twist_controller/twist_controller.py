@@ -31,8 +31,6 @@ class Controller(object):
         ts = 0.02 # Sample time
         self.vel_lpf = LowPassFilter(tau,ts)
 
-
-
         self.last_time = rospy.get_time()
 
     def control(self, current_vel, dbw_enabled, target_vel, target_angel):
@@ -52,7 +50,7 @@ class Controller(object):
         # rospy.logwarn("Filtered velocity: {0}" .format(self.vel_lpf.get()))
         # rospy.logwarn("Target velocity: {0}" .format(target_vel))
 
-        # TIME
+        # Time
         current_time = rospy.get_time()
         sample_time = current_time - self.last_time
         self.last_time = current_time
@@ -64,11 +62,11 @@ class Controller(object):
         brake = 0.
 
         if target_vel == 0. and current_vel < 0.1:
-            # Standstill
+            # standstill
             throttle = 0.
             brake = 700 #N*m - to hold the car in place if we are stopped at a light. Accelevaration ~ 1m/s^2
         elif throttle <0.1 and vel_error < 0.:
-            # Braking
+            # decelerate
             throttle = 0.
             decel = max(vel_error, self.decel_limit)
             brake = abs(decel)*self.vehicle_mass*self.wheel_radius # Torque N*m
