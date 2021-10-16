@@ -47,9 +47,9 @@ class WaypointUpdater(object):
         self.loop()
 
     def loop(self):
-        rate = rospy.Rate(50)
+        rate = rospy.Rate(10)
         while not rospy.is_shutdown():
-            if self.pose and self.base_lane and self.waypoint_tree:
+            if self.pose and self.base_lane and self.waypoints_2d:
                 # Get closest waypoint
                 self.publish_waypoints()
             rate.sleep()
